@@ -1,1 +1,220 @@
+BUILD GRADLE: 
+buildscript {     ext { 
+        compose_ui_version = '1.2.0' 
+    } 
+}// Top-level build file where you can add configuration options common to all subprojects/modules. 
+plugins { 
+    id 'com.android.application' version '7.4.2' apply false 
+    id 'com.android.library' version '7.4.2' apply false 
+    id 'org.jetbrains.kotlin.android' version '1.7.0' apply false 
+} 
+plugins { 
+    id 'com.android.application' 
+    id 'org.jetbrains.kotlin.android' 
+} 
+ 
+android { 
+    namespace 'com.example.projectone' compileSdk 33 
+ 
+    defaultConfig { 
+        applicationId "com.example.projectone"         minSdk 24         targetSdk 33         versionCode 1 
+        versionName "1.0" 
+ 
+        testInstrumentationRunner 
+"androidx.test.runner.AndroidJUnitRunner" 
+        vectorDrawables { 
+            useSupportLibrary true 
+        } 
+    } 
+ 
+    buildTypes {         release { 
+            minifyEnabled false 
+            proguardFiles 
+getDefaultProguardFile('proguard-androidoptimize.txt'), 'proguard-rules.pro' 
+        } 
+    } 
+compileOptions { 
+        sourceCompatibility JavaVersion.VERSION_1_8 
+        targetCompatibility 
+JavaVersion.VERSION_1_8 
+    } 
+    kotlinOptions { 
+        jvmTarget = '1.8' 
+    } 
+    buildFeatures { 
+        compose true 
+    } 
+    composeOptions { 
+        kotlinCompilerExtensionVersion '1.2.0' 
+    } 
+    packagingOptions {         resources { 
+            excludes += '/META-INF/{AL2.0,LGPL2.1}' 
+        } 
+    } 
+} 
+ 
+dependencies { 
+ 
+implementation 'androidx.core:core-ktx:1.7.0' 
+    implementation 'androidx.lifecycle:lifecycleruntime-ktx:2.3.1' 
+    implementation 'androidx.activity:activitycompose:1.3.1'     implementation 
+"androidx.compose.ui:ui:$compose_ui_version"     implementation "androidx.compose.ui:uitooling-preview:$compose_ui_version" 
+    implementation 
+'androidx.compose.material:material:1.2.0'     implementation 'androidx.room:roomcommon:2.5.0' 
+    implementation 'androidx.room:room-ktx:2.5.0' 
+    testImplementation 'junit:junit:4.13.2'     androidTestImplementation 'androidx.test.ext:junit:1.1.5'     androidTestImplementation 
+'androidx.test.espresso:espresso-core:3.5.1'     androidTestImplementation "androidx.compose.ui:ui-testjunit4:$compose_ui_version" 
+    debugImplementation "androidx.compose.ui:uitooling:$compose_ui_version" debugImplementation "androidx.compose.ui:ui-
+test-manifest:$compose_ui_version" 
+} 
+ 
+ 
+ 
+ 
+ANDRIODMANIFEST .XML 	 
+<?xml version="1.0" encoding="utf-8"?> 
+<manifest 
+xmlns:android="http://schemas.android.com/apk
+/res/android" 
+    
+xmlns:tools="http://schemas.android.com/tools"
+> 
+ 
+    <application 
+        android:allowBackup="true" 
+        
+android:dataExtractionRules="@xml/data_extract ion_rules" 
+        
+android:fullBackupContent="@xml/backup_rules"         android:icon="@mipmap/ic_launcher"         android:label="@string/app_name"         android:supportsRtl="true" 
+        android:theme="@style/Theme.ProjectOne" 
+        tools:targetApi="31"> 
+        <activity 
+            android:name=".TrackActivity"             android:exported="false" 
+            
+android:label="@string/title_activity_track" 
+            
+android:theme="@style/Theme.ProjectOne" /> 
+        <activity 
+            android:name=".MainActivity"             android:exported="false" 
+            android:label="@string/app_name" 
+            
+android:theme="@style/Theme.ProjectOne" /> 
+        <activity 
+            android:name=".MainActivity2"             android:exported="false" 
+            android:label="RegisterActivity" 
+            
+android:theme="@style/Theme.ProjectOne" /> 
+        <activity 
+            android:name=".LoginActivity"             android:exported="true" 
+            android:label="@string/app_name" 
+            
+android:theme="@style/Theme.ProjectOne"> 
+            <intent-filter> 
+                <action 
+android:name="android.intent.action.MAIN" /> 
+ 
+                <category 
+android:name="android.intent.category.LAUNCHE
+R" /> 
+            </intent-filter> 
+        </activity> 
+    </application> 
+ 
+</manifest> 
+ 
+ 
+ 
+ 
+ 
+MAINACTIVITY.KT 
+package com.example.projectone 
+ 
+import android.content.Context import android.content.Intent import android.icu.text.SimpleDateFormat import android.os.Bundle 
+import androidx.activity.ComponentActivity import androidx.activity.compose.setContent import androidx.compose.foundation.Image import androidx.compose.foundation.layout.* import androidx.compose.material.Button import 
+androidx.compose.material.MaterialTheme import androidx.compose.material.Surface import androidx.compose.material.Text import androidx.compose.runtime.* import androidx.compose.ui.Alignment import androidx.compose.ui.Modifier import androidx.compose.ui.draw.alpha import androidx.compose.ui.layout.ContentScale import androidx.compose.ui.res.painterResource import androidx.compose.ui.unit.dp 
+import androidx.core.content.ContextCompat import 
+com.example.projectone.ui.theme.ProjectOneThe me 
+import java.util.* 
+ 
+class MainActivity : ComponentActivity() { 
+ 
+    private lateinit var databaseHelper: 
+TimeLogDatabaseHelper 
+ 
+    override fun onCreate(savedInstanceState: Bundle?) { 
+        super.onCreate(savedInstanceState) 
+        databaseHelper = 
+TimeLogDatabaseHelper(this)         databaseHelper.deleteAllData() 
+        setContent { 
+            ProjectOneTheme { 
+                // A surface container using the 
+'background' color from the theme 
+                Surface( 
+                    modifier = Modifier.fillMaxSize(),                     color = MaterialTheme.colors.background 
+                ) { 
+                    MyScreen(this,databaseHelper) 
+                } 
+            } 
+        } 
+    } 
+} 
+@Composable fun MyScreen(context: Context, databaseHelper: TimeLogDatabaseHelper) {     var startTime by remember { mutableStateOf(0L) }     var elapsedTime by remember { mutableStateOf(0L) }     var isRunning by remember { mutableStateOf(false) }     val imageModifier = Modifier     Image( 
+        painterResource(id = R.drawable.sleeptracking), 
+        contentScale = ContentScale.FillHeight,         contentDescription = "",         modifier = imageModifier 
+            .alpha(0.3F), 
+    ) 
+ 
+    Column( 
+        modifier = Modifier.fillMaxSize(),         horizontalAlignment = Alignment.CenterHorizontally, 
+        verticalArrangement = Arrangement.Center 
+    ) { 
+        if (!isRunning) {             Button(onClick = { 
+                startTime = System.currentTimeMillis() 
+                isRunning = true 
+            }) { 
+                Text("Start") 
+                
+//databaseHelper.addTimeLog(startTime) 
+            } 
+        } else { 
+            Button(onClick = {                 elapsedTime = 
+System.currentTimeMillis() 
+                isRunning = false 
+            }) { 
+                Text("Stop") 
+                
+databaseHelper.addTimeLog(elapsedTime,startTi me) 
+            } 
+        } 
+        Spacer(modifier = Modifier.height(16.dp))         Text(text = "Elapsed Time: 
+${formatTime(elapsedTime - startTime)}") 
+ 
+ 
+        Spacer(modifier = Modifier.height(16.dp)) 
+        Button(onClick = { context.startActivity( 
+            Intent(                 context, 
+                TrackActivity::class.java 
+            ) 
+        ) }) { 
+            Text(text = "Track Sleep") 
+        } 
+ 
+    } 
+ 
+} 
+ 
+private fun startTrackActivity(context: Context) { 
+    val intent = Intent(context, 
+TrackActivity::class.java) 
+    ContextCompat.startActivity(context, intent, null) } 
+fun getCurrentDateTime(): String { 
+    val dateFormat = SimpleDateFormat("yyyy-MMdd HH:mm:ss", Locale.getDefault())     val currentTime = System.currentTimeMillis() 
+    return dateFormat.format(Date(currentTime)) 
+} 
+ 
+fun formatTime(timeInMillis: Long): String {     val hours = (timeInMillis / (1000 * 60 * 60)) % 
+24 
+    val minutes = (timeInMillis / (1000 * 60)) % 60     val seconds = (timeInMillis / 1000) % 60     return String.format("%02d:%02d:%02d", hours, minutes, seconds) 
+} 
+ 
 
